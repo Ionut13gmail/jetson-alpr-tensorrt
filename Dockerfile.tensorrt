@@ -21,6 +21,7 @@ COPY convert_to_tensorrt.py /app/
 # Copy optimized inference scripts
 COPY jetson_alpr_tensorrt.py /app/
 COPY jetson_alpr.py /app/
+COPY benchmark_comparison.py /app/
 
 # Copy assets (test images, etc) - optional, only if assets directory exists
 # Note: COPY command doesn't support shell redirects, so we skip this
