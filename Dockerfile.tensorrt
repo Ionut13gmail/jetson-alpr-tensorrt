@@ -1,0 +1,37 @@
+# Optimized Dockerfile for Jetson Nano ALPR with TensorRT
+# Target: 10-15 FPS performance with .engine files
+FROM dustynv/l4t-ml:r32.7.1
+
+WORKDIR /app
+
+# Install additional dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3-pip \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install pycuda for TensorRT Python bindings
+RUN pip3 install --no-cache-dir pycuda
+
+# Copy models directory
+COPY models/ /app/models/
+
+# Copy conversion script
+COPY convert_to_tensorrt.py /app/
+
+# Copy optimized inference scripts
+COPY jetson_alpr_tensorrt.py /app/
+COPY jetson_alpr.py /app/
+
+# Copy assets (test images, etc)
+COPY assets/ /app/assets/ 2>/dev/null || echo "No assets directory"
+
+# Convert ONNX models to TensorRT .engine files during build
+# This is done once during build, not at runtime
+RUN python3 /app/convert_to_tensorrt.py || echo "WARNING: TensorRT conversion failed, will use ONNX Runtime fallback"
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1
+ENV CUDA_VISIBLE_DEVICES=0
+
+# Default command - use TensorRT version if engines exist, otherwise fall back to ONNX
+CMD ["sh", "-c", "if [ -f /app/models/detector_fp16.engine ]; then python3 /app/jetson_alpr_tensorrt.py; else python3 /app/jetson_alpr.py; fi"]

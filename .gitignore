@@ -1,0 +1,54 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Models and engines
+*.onnx
+*.engine
+*.pt
+*.pth
+*.trt
+models/*.engine
+models/*.onnx
+
+# Cache
+.cache/
+*.log
+
+# Docker
+.dockerignore
+
+# Output
+output/
+results/
+*.jpg
+*.png
+samples/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets
+.env
+*.key
+*.pem
+credentials.json

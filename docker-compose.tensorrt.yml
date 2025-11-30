@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  alpr-tensorrt:
+    build:
+      context: .
+      dockerfile: Dockerfile.tensorrt
+    image: jetson-alpr-tensorrt:latest
+    runtime: nvidia
+    container_name: alpr-tensorrt
+    volumes:
+      # Mount sample images
+      - /home/samples:/app/samples:ro
+      # Mount output directory
+      - ./output:/app/output
+      # Optional: mount models for development
+      # - ./models:/app/models
+    environment:
+      - CUDA_VISIBLE_DEVICES=0
+      - PYTHONUNBUFFERED=1
+    # Network mode for potential API access
+    network_mode: host
+    # Restart policy
+    restart: unless-stopped
+    # Command override for testing
+    # command: python3 /app/benchmark_comparison.py
