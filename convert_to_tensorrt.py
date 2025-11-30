@@ -53,17 +53,19 @@ def build_engine(onnx_file_path, engine_file_path, fp16_mode=True, max_batch_siz
     # Build engine configuration
     config = builder.create_builder_config()
 
-    # Set memory pool limit (important for Jetson Nano with limited memory)
-    # Jetson Nano has 2GB RAM, be conservative
-    config.set_memory_pool_limit(trt.MemoryPoolType.WORKSPACE, 1 << 28)  # 256MB
+    # Set workspace size (important for Jetson Nano with limited memory)
+    # TensorRT 8.x uses max_workspace_size instead of set_memory_pool_limit
+    # Jetson Nano has 2GB RAM, be conservative with 256MB workspace
+    config.max_workspace_size = 1 << 28  # 256MB
 
     # Enable FP16 mode if supported and requested
     if fp16_mode and builder.platform_has_fast_fp16:
         print("Enabling FP16 mode for faster inference")
         config.set_flag(trt.BuilderFlag.FP16)
 
-    # Enable TF32 (Tensor Float 32) if available
-    if builder.platform_has_tf32:
+    # Enable TF32 (Tensor Float 32) if available (for newer GPUs)
+    # Note: Jetson Nano (Maxwell GPU) doesn't support TF32, but check anyway
+    if hasattr(builder, 'platform_has_tf32') and builder.platform_has_tf32:
         print("Enabling TF32 mode")
         config.set_flag(trt.BuilderFlag.TF32)
 
