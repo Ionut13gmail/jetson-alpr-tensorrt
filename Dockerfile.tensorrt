@@ -22,8 +22,9 @@ COPY convert_to_tensorrt.py /app/
 COPY jetson_alpr_tensorrt.py /app/
 COPY jetson_alpr.py /app/
 
-# Copy assets (test images, etc)
-COPY assets/ /app/assets/ 2>/dev/null || echo "No assets directory"
+# Copy assets (test images, etc) - optional, only if assets directory exists
+# Note: COPY command doesn't support shell redirects, so we skip this
+# Assets can be mounted as volumes instead: -v ./assets:/app/assets
 
 # Convert ONNX models to TensorRT .engine files during build
 # This is done once during build, not at runtime
